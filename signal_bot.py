@@ -1,7 +1,7 @@
 import os, time, requests
 
-TOKEN = os.environ["TELEGRAM_TOKEN"]
-CHAT_ID = os.environ["CHAT_ID"]
+TOKEN = os.environ["TELEGRAM_TOKEN"].strip()
+CHAT_ID = os.environ["CHAT_ID"].strip()
 SYMBOL = "GC=F"
 NAME = "الذهب"
 INTERVAL = "15m"
@@ -9,8 +9,9 @@ MANUAL = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
 
 
 def send(text):
-    requests.post("https://api.telegram.org/bot" + TOKEN + "/sendMessage",
-                  data={"chat_id": CHAT_ID, "text": text}, timeout=15)
+    r = requests.post("https://api.telegram.org/bot" + TOKEN + "/sendMessage",
+                      data={"chat_id": CHAT_ID, "text": text}, timeout=15)
+    print("تليجرام:", r.status_code, r.text)
 
 
 def get_candles():
@@ -65,7 +66,7 @@ elif f[-2] > s[-2] and f[-1] < s[-1] and rsi(closes) > 30:
     side = "بيع 🔴"
     sl, tp = price + 1.5 * atr(rows), price - 3 * atr(rows)
 
-fresh = (time.time() - (t + 900)) < 900  # الشمعة اتقفلت من أقل من 15 دقيقة
+fresh = (time.time() - (t + 900)) < 900
 print("السعر:", round(price, 2), "| إشارة:", side, "| جديدة:", fresh)
 
 if MANUAL:
